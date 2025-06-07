@@ -3,6 +3,7 @@
 namespace App\Modules\Antrian\Resources;
 
 use App\Libraries\Abstract\Resource;
+use App\Modules\Antrian\Libraries\Utility;
 use App\Modules\Antrian\Models\Organization;
 
 class OrganizationResource extends Resource

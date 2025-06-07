@@ -25,4 +25,9 @@ class Organization extends Model
     {
         return $date->format('Y-m-d H:i:s');
     }
+
+    public function shifts()
+    {
+        return $this->hasMany(OrganizationShift::class, 'organization_id');
+    }
 }

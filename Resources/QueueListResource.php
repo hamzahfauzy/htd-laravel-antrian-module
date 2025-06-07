@@ -3,6 +3,7 @@
 namespace App\Modules\Antrian\Resources;
 
 use App\Libraries\Abstract\Resource;
+use App\Modules\Antrian\Libraries\Utility;
 use App\Modules\Antrian\Models\QueueList;
 
 class QueueListResource extends Resource
@@ -15,6 +16,17 @@ class QueueListResource extends Resource
     protected static ?string $routeGroup = 'antrian';
 
     protected static $model = QueueList::class;
+
+    public static function getModel()
+    {
+        $organization = Utility::getUserOrganization(auth()->user());
+        if($organization)
+        {
+            return (new static::$model)->where('organization_id', $organization->organization_id);
+        }
+
+        return new static::$model;
+    }
 
     public static function table()
     {
@@ -56,6 +68,11 @@ class QueueListResource extends Resource
             'title' => static::$navigationLabel,
             'button' => []
         ];
+    }
+
+    public static function getAction($d)
+    {
+        return '-';
     }
 
 }

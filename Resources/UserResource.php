@@ -3,6 +3,7 @@
 namespace App\Modules\Antrian\Resources;
 
 use App\Libraries\Abstract\Resource;
+use App\Modules\Antrian\Libraries\Utility;
 use App\Modules\Antrian\Models\Organization;
 use App\Modules\Antrian\Models\OrganizationUser;
 use App\Modules\Base\Models\User;
@@ -17,6 +18,17 @@ class UserResource extends Resource
     protected static ?string $routeGroup = 'antrian';
 
     protected static $model = OrganizationUser::class;
+
+    public static function getModel()
+    {
+        $organization = Utility::getUserOrganization(auth()->user());
+        if($organization)
+        {
+            return (new static::$model)->where('organization_id', $organization->organization_id);
+        }
+
+        return new static::$model;
+    }
 
     public static function table()
     {

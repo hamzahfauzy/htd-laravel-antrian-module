@@ -74,4 +74,9 @@ class ReservationResource extends Resource
         ];
     }
 
+    public static function getAction($d)
+    {
+        return '-';
+    }
+
 }

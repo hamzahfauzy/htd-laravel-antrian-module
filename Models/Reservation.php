@@ -21,4 +21,14 @@ class Reservation extends Model
     {
         return $date->format('Y-m-d H:i:s');
     }
+
+    public function organization()
+    {
+        return $this->belongsTo(Organization::class, 'organization_id');
+    }
+    
+    public function queue()
+    {
+        return $this->belongsTo(QueueList::class, 'list_id');
+    }
 }

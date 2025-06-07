@@ -3,6 +3,7 @@
 namespace App\Modules\Antrian\Resources;
 
 use App\Libraries\Abstract\Resource;
+use App\Modules\Antrian\Libraries\Utility;
 use App\Modules\Antrian\Models\Organization;
 use App\Modules\Antrian\Models\OrganizationShift;
 
@@ -16,6 +17,17 @@ class ShiftResource extends Resource
     protected static ?string $routeGroup = 'antrian';
 
     protected static $model = OrganizationShift::class;
+
+    public static function getModel()
+    {
+        $organization = Utility::getUserOrganization(auth()->user());
+        if($organization)
+        {
+            return (new static::$model)->where('organization_id', $organization->organization_id);
+        }
+
+        return new static::$model;
+    }
 
     public static function table()
     {
@@ -42,6 +54,11 @@ class ShiftResource extends Resource
     public static function form()
     {
         $organizations = Organization::pluck('name','id');
+        $organization = Utility::getUserOrganization(auth()->user());
+        if($organization)
+        {
+            $organizations = Organization::where('id', $organization->organization_id)->pluck('name','id');
+        }
         return [
             'Form Hari Kerja' => [
                 'organization_id' => [
