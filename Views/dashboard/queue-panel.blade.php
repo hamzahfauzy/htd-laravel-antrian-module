@@ -1,7 +1,9 @@
+@if(\App\Modules\Antrian\Libraries\Utility::getUserOrganization(auth()->user()))
 <div class="container p-0">
     <div class="row">
         <div class="col-12 text-center">
-            <h2 id="organization_name">{{\App\Modules\Antrian\Libraries\Utility::getUserOrganization(auth()->user())->organization->name}}</h2>
+            <h2 id="organization_name">{{\App\Modules\Antrian\Libraries\Utility::getUserOrganization(auth()->user())?->organization?->name}}</h2>
+            <div class="d-none" id="pos_number">{{\App\Modules\Antrian\Libraries\Utility::getUserOrganization(auth()->user())?->organization?->pos_number}}</div>
         </div>
         <div class="col-12 col-md-4">
             <div class="card">
@@ -110,6 +112,12 @@ function caller(type)
         document.querySelector('#now-serve').innerHTML = '000'
         document.querySelector('#btn-serving').style.display = 'none'
         document.querySelector('#btn-next').style.display = 'none'
+
+        socket.emit('send', {
+            target: 'display-'+window.SOCKET_ID,
+            message: '-'
+        })
+        
         return
     }
     const queueNumber = selectedRow.dataset.number
@@ -129,7 +137,12 @@ function caller(type)
 
     socket.emit('send', {
         target:'caller_device',
-        message: 'Antrian dengan nomor ' + queueNumber + ' agar segera menuju ke loket pelayanan ' + document.querySelector('#organization_name').innerHTML
+        message: 'Antrian dengan nomor ' + queueNumber + ' agar segera menuju ke loket ' + document.querySelector('#pos_number').innerHTML
+    })
+
+    socket.emit('send', {
+        target: 'display-'+window.SOCKET_ID,
+        message: queueNumber
     })
 }
 
@@ -218,3 +231,4 @@ setInterval(function(){
     loadQueue('OFFLINE','#offline-queue')
 }, 10000)
 </script>
+@endif

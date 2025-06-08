@@ -41,8 +41,8 @@ class AntrianController extends Controller
     {
         $date = now()->format('Y-m-d');
         $queue = QueueList::where('organization_id', $organization_id)->where('record_type','OFFLINE')->where('created_at','LIKE',"%$date%")->latest()->first();
-        $nextQueueNumber = $queue?->queue_number ? ((int) filter_var($queue->queue_number, FILTER_SANITIZE_NUMBER_INT))+1 : 1;
         $organization = Organization::where('id', $organization_id)->first();
+        $nextQueueNumber = $queue?->queue_number ? ((int) filter_var(str_replace($organization->initial_name.'-','',$queue->queue_number), FILTER_SANITIZE_NUMBER_INT))+1 : 1;
 
         $queue = QueueList::create([
             'organization_id' => $organization_id,
@@ -98,8 +98,8 @@ class AntrianController extends Controller
 
         $date = now()->format('Y-m-d');
         $queue = QueueList::where('organization_id', $reservation->organization_id)->where('record_type','ONLINE')->where('created_at','LIKE',"%$date%")->latest()->first();
-        $nextQueueNumber = $queue?->queue_number ? ((int) filter_var(str_replace('O-','',$queue->queue_number), FILTER_SANITIZE_NUMBER_INT))+1 : 1;
         $organization = $reservation->organization;
+        $nextQueueNumber = $queue?->queue_number ? ((int) filter_var(str_replace($organization->initial_name.'-','',$queue->queue_number), FILTER_SANITIZE_NUMBER_INT))+1 : 1;
 
         $queue = QueueList::create([
             'organization_id' => $reservation->organization_id,
@@ -141,5 +141,10 @@ class AntrianController extends Controller
         QueueList::where('id', $id)->update([
             'record_status' => 'DONE'
         ]);
+    }
+
+    public function queueDisplay()
+    {
+        return view('antrian::queue-display');
     }
 }

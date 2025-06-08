@@ -8,6 +8,7 @@ Route::get('/landing', function(){
     return view('antrian::landing');
 });
 
+Route::get('/queue-display', [\App\Modules\Antrian\Controllers\AntrianController::class, 'queueDisplay'])->middleware('web');
 Route::get('/working-opd', [\App\Modules\Antrian\Controllers\AntrianController::class, 'getOpd']);
 Route::get('/take-queue/{organization_id}', [\App\Modules\Antrian\Controllers\AntrianController::class, 'take']);
 Route::post('/reservation', [\App\Modules\Antrian\Controllers\AntrianController::class, 'reservation']);

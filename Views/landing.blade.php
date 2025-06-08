@@ -84,8 +84,8 @@
                 <button class="btn btn-primary btn-ambil-antrian" data-bs-toggle="modal" data-bs-target="#opdModal">Ambil Antrian</button>
                 &nbsp;&nbsp;
                 <button class="btn btn-success btn-ambil-antrian" data-bs-toggle="modal" data-bs-target="#boardingModal">Boarding</button>
-                &nbsp;&nbsp;
-                <button class="btn btn-success btn-ambil-antrian" onclick="speakNow()" id="btn-panggil">Panggil</button>
+                {{-- &nbsp;&nbsp;
+                <button class="btn btn-success btn-ambil-antrian" onclick="speakNow()" id="btn-panggil">Panggil</button> --}}
             </div>
         </div>
     </section>

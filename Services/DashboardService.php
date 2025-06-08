@@ -6,6 +6,6 @@ class DashboardService
 {
     static function queueDisplayDashboard()
     {
-        return view('antrian::dashboard.queue-display');
+        return view('antrian::dashboard.queue-panel');
     }
 }

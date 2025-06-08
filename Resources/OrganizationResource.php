@@ -36,6 +36,10 @@ class OrganizationResource extends Resource
                 'label' => 'Limit Antrian',
                 '_searchable' => true
             ],
+            'pos_number' => [
+                'label' => 'Nomor Loket',
+                '_searchable' => true
+            ],
             'creator.name' => [
                 'label' => 'Dibuat Oleh',
                 '_searchable' => true
@@ -75,6 +79,11 @@ class OrganizationResource extends Resource
                     'type' => 'number',
                     'placeholder' => 'Masukkan Limit Antrian'
                 ],
+                'pos_number' => [
+                    'label' => 'Nomor Loket',
+                    'type' => 'number',
+                    'placeholder' => 'Masukkan Nomor Loket'
+                ],
             ]
         ];
     }
@@ -87,6 +96,7 @@ class OrganizationResource extends Resource
                 'name' => 'Nama',
                 'service_status' => 'Antrian Online/Reservasi',
                 'queue_limit' => 'Limit Antrian',
+                'pos_number' => 'Nomor Loket',
                 'creator.name' => 'Dibuat Oleh',
                 'created_at' => 'Tanggal Dibuat',
             ],
@@ -96,20 +106,23 @@ class OrganizationResource extends Resource
     public static function createRules()
     {
         return [
-            'initial_name' => 'required|sometimes|unique:q_organizations',
+            'initial_name' => 'required|unique:q_organizations',
             'name' => 'required',
             'service_status' => 'required',
             'queue_limit' => 'required',
+            'pos_number' => 'required',
         ];
     }
     
     public static function updateRules()
     {
+        $id = request()->route()->parameter('id');
         return [
-            'initial_name' => 'required|sometimes|unique:q_organizations',
+            'initial_name' => 'required|sometimes|unique:q_organizations,initial_name,'.$id,
             'name' => 'required',
             'service_status' => 'required',
             'queue_limit' => 'required',
+            'pos_number' => 'required',
         ];
     }
 }
