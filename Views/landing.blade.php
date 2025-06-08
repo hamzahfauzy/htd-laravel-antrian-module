@@ -84,6 +84,8 @@
                 <button class="btn btn-primary btn-ambil-antrian" data-bs-toggle="modal" data-bs-target="#opdModal">Ambil Antrian</button>
                 &nbsp;&nbsp;
                 <button class="btn btn-success btn-ambil-antrian" data-bs-toggle="modal" data-bs-target="#boardingModal">Boarding</button>
+                &nbsp;&nbsp;
+                <button class="btn btn-success btn-ambil-antrian" onclick="speakNow()" id="btn-panggil">Panggil</button>
             </div>
         </div>
     </section>
@@ -126,8 +128,35 @@
     </div>
 
     <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://code.responsivevoice.org/responsivevoice.js?key=R2qA371F"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js" integrity="sha384-mkQ3/7FUtcGyoppY6bz/PORYoGqOl7/aSUMn2ymDOJcapfS6PHqxhRTMh1RR0Q6+" crossorigin="anonymous"></script>
     <script>
+    responsiveVoice.enableWindowClickHook();
+    window.SOCKET_URL  = "{{env('SOCKET_URL', 'http://localhost:3001')}}"; 
+    window.SOCKET_PATH = "{{env('SOCKET_PATH', '') . env('SOCKET_IO_PATH', '')}}";
+    window.SOCKET_ID   = "caller_device";
+    window.calling_queue = []
+    window.is_calling = false
+    const socket = io(window.SOCKET_URL,{
+        path: window.SOCKET_PATH
+    });
+    socket.on("connect", () => {
+    
+        socket.emit('subscribe', {userId:window.SOCKET_ID})
+    
+        socket.on('receive', data => {
+            // window.calling_queue.push(data.message)
+            // if(responsiveVoice.isPlaying())
+            // {
+            // }
+            // else
+            // {
+            // }
+            calling(data.message)
+        })
+    });
+
     function loadOpd()
     {
         fetch('/working-opd')
@@ -188,6 +217,51 @@
                 console.log(err)
             })
     }
+
+    function calling(text)
+    {
+        // window.is_calling = true
+        responsiveVoice.cancel();
+        responsiveVoice.speak(text,'Indonesian Female');
+    }
+
+    function voiceStartCallback() {
+        console.log("Voice started");
+    }
+
+    function voiceEndCallback()
+    {
+        console.log("Voice Ended");
+        window.calling_queue = window.calling_queue.shift()
+        if(window.calling_queue.length)
+        {
+            setTimeout(() => {
+                calling(window.calling_queue[0])
+            }, 1000);
+        }
+        else
+        {
+            window.is_calling = false
+        }
+    }
+
+    function speakNow() {
+      if (!responsiveVoice.voiceSupport()) {
+        console.log("Browser tidak mendukung ResponsiveVoice");
+        return;
+      }
+
+      responsiveVoice.cancel();
+      responsiveVoice.speak("Halo, ini pengujian responsive voice", "Indonesian Female", {
+        onstart: () => console.log("🔊 Mulai bicara"),
+        onend: () => console.log("✅ Bicara selesai"),
+        onerror: (err) => console.error("❌ Terjadi error:", err)
+      });
+    }
+
+    // setTimeout(function(){
+    //     document.querySelector('#btn-panggil').click()
+    // }, 2000)
 
     loadOpd()
     </script>

@@ -3,14 +3,27 @@
 namespace App\Modules\Antrian\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Antrian\Libraries\Utility;
 use App\Modules\Antrian\Models\Organization;
 use App\Modules\Antrian\Models\QueueList;
 use App\Modules\Antrian\Models\Reservation;
-use App\Modules\Antrian\Services\Printer;
 use Illuminate\Http\Request;
 
 class AntrianController extends Controller
 {
+
+    public function index($type)
+    {
+        $date = now()->format('Y-m-d');
+        $organization = Utility::getUserOrganization(auth()->user());
+        $queues = QueueList::where('organization_id', $organization->organization_id)->where('record_type',$type)->where('created_at','LIKE',"%$date%")->get();
+
+        return response()->json([
+            'message' => 'queue retrieved',
+            'data' => $queues,
+        ]);
+    }
+
     public function getOpd()
     {
         $currentDay = \Carbon\Carbon::createFromDate(request('date', now()))->format('N');
@@ -29,22 +42,17 @@ class AntrianController extends Controller
         $date = now()->format('Y-m-d');
         $queue = QueueList::where('organization_id', $organization_id)->where('record_type','OFFLINE')->where('created_at','LIKE',"%$date%")->latest()->first();
         $nextQueueNumber = $queue?->queue_number ? ((int) filter_var($queue->queue_number, FILTER_SANITIZE_NUMBER_INT))+1 : 1;
+        $organization = Organization::where('id', $organization_id)->first();
 
         $queue = QueueList::create([
             'organization_id' => $organization_id,
-            'queue_number' => str_pad($nextQueueNumber, 3, '0', STR_PAD_LEFT),
+            'queue_number' => $organization->initial_name . '-'. str_pad($nextQueueNumber, 3, '0', STR_PAD_LEFT),
             'record_type' => 'OFFLINE',
             'record_status' => 'ON QUEUE',
         ]);
 
         $queue->organization;
         $queue->nomor = $queue->queue_number;
-
-        // (new Printer)->printStruk([
-        //     'tanggal' => date('Y-m-d H:i:s'),
-        //     'nomor' => str_pad($nextQueueNumber, 3, '0', STR_PAD_LEFT),
-        //     'nama_opd' => $queue->organization->name
-        // ]);
 
         return response()->json([
             'message' => 'queue success',
@@ -91,10 +99,11 @@ class AntrianController extends Controller
         $date = now()->format('Y-m-d');
         $queue = QueueList::where('organization_id', $reservation->organization_id)->where('record_type','ONLINE')->where('created_at','LIKE',"%$date%")->latest()->first();
         $nextQueueNumber = $queue?->queue_number ? ((int) filter_var(str_replace('O-','',$queue->queue_number), FILTER_SANITIZE_NUMBER_INT))+1 : 1;
+        $organization = $reservation->organization;
 
         $queue = QueueList::create([
             'organization_id' => $reservation->organization_id,
-            'queue_number' => 'O-'.str_pad($nextQueueNumber, 3, '0', STR_PAD_LEFT),
+            'queue_number' => $organization->initial_name.'-O.'.str_pad($nextQueueNumber, 3, '0', STR_PAD_LEFT),
             'record_type' => 'ONLINE',
             'record_status' => 'ON QUEUE',
         ]);
@@ -110,6 +119,27 @@ class AntrianController extends Controller
         return response()->json([
             'message' => 'queue success',
             'data' => $queue
+        ]);
+    }
+
+    public function skipQueue($id)
+    {
+        QueueList::where('id', $id)->update([
+            'record_status' => 'SKIP'
+        ]);
+    }
+    
+    public function serveQueue($id)
+    {
+        QueueList::where('id', $id)->update([
+            'record_status' => 'SERVING'
+        ]);
+    }
+    
+    public function doneQueue($id)
+    {
+        QueueList::where('id', $id)->update([
+            'record_status' => 'DONE'
         ]);
     }
 }

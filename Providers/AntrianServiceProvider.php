@@ -14,6 +14,8 @@ class AntrianServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(__DIR__.'/../Databases/migrations');
         $this->loadRoutesFrom(__DIR__.'/../Routes/web.php');
         $this->loadViewsFrom(__DIR__.'/../Views', 'antrian');
+
+        Dashboard::add(\App\Modules\Antrian\Services\DashboardService::queueDisplayDashboard());
     
         Dashboard::setWelcomeScreen(view('antrian::welcome'));
 
