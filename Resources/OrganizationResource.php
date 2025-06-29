@@ -5,6 +5,8 @@ namespace App\Modules\Antrian\Resources;
 use App\Libraries\Abstract\Resource;
 use App\Modules\Antrian\Libraries\Utility;
 use App\Modules\Antrian\Models\Organization;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class OrganizationResource extends Resource
 {
@@ -84,6 +86,14 @@ class OrganizationResource extends Resource
                     'type' => 'number',
                     'placeholder' => 'Masukkan Nomor Loket'
                 ],
+                'description' => [
+                    'label' => 'Deskripsi',
+                    'type' => 'texteditor',
+                ],
+                'pic_url' => [
+                    'label' => 'Foto',
+                    'type' => 'file',
+                ],
             ]
         ];
     }
@@ -97,6 +107,13 @@ class OrganizationResource extends Resource
                 'service_status' => 'Antrian Online/Reservasi',
                 'queue_limit' => 'Limit Antrian',
                 'pos_number' => 'Nomor Loket',
+                'description' => 'Deskripsi',
+                'pic_url' => [
+                    'label' => 'Gambar',
+                    'content' => function($value) {
+                        return '<a href="'.Storage::url($value).'" target="_blank">Lihat</a>';
+                    }
+                ],
                 'creator.name' => 'Dibuat Oleh',
                 'created_at' => 'Tanggal Dibuat',
             ],

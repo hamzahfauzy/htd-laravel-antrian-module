@@ -17,7 +17,7 @@ class AntrianServiceProvider extends ServiceProvider
 
         Dashboard::add(\App\Modules\Antrian\Services\DashboardService::queueDisplayDashboard());
     
-        Dashboard::setWelcomeScreen(view('antrian::welcome'));
+        Dashboard::setWelcomeScreen(view('antrian::index'));
 
         NavPanel::add([
             'url' => url('/queue-display'),
