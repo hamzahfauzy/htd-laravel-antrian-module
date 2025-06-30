@@ -114,7 +114,7 @@
                 <div class="container py-4 text-center">
                     <h2 class="fs-2 fw-bold">Tidak Mau Nunggu Lama ? <br> Yuk Ambil Antrian</h2>
 
-                    <button class="btn btn-warning mt-3 btn-lg text-uppercase fw-medium">Ambil Antrian Online</button>
+                    <button class="btn btn-warning mt-3 btn-lg text-uppercase fw-medium" data-bs-toggle="modal" data-bs-target="#boardingModal">Ambil Antrian Online</button>
                 </div>
             </div>
             <div class="p-5 bg-body-secondary" id="loket">
@@ -339,9 +339,120 @@
             </div>
         </footer>
 
-        <script
-            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
-            crossorigin="anonymous"></script>
+        <div class="modal fade" id="boardingModal" aria-labelledby="boardingModalLabel" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="boardingModalLabel">Form Reservasi</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        @csrf
+                        <div class="form-group mb-2">
+                            <label for="">Tanggal Reservasi</label>
+                            <input type="date" class="form-control" id="date" onchange="loadOpd()" min="{{strtotime('now') < strtotime(date('Y-m-d 17:00:00')) ? date('Y-m-d') : date('Y-m-d', strtotime('now +1d'))}}">
+                        </div>
+                        <div class="form-group mb-2">
+                            <label for="">OPD / Layanan Tujuan</label>
+                            <select name="" id="organization_id" class="form-control opd-list">
+                                <option value="">Pilih</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-2">
+                            <label for="">Nama</label>
+                            <input type="text" class="form-control" id="name">
+                        </div>
+                        <div class="form-group mb-2">
+                            <label for="">No HP</label>
+                            <input type="tel" class="form-control" id="phone">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        <button class="btn btn-primary" onclick="reservation()">Buat Reservasi</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="reservationModal" aria-labelledby="reservationModalLabel" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="reservationModalLabel">Form Reservasi</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <h2>Kode Reservasi Anda:</h2>
+                        <h1 class="reservation-content"></h1>
+                        <p>Silahkan salin kode ini dan gunakan pada saat boarding di Mall Pelayanan Publik</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+        <script>
+            function loadOpd()
+            {
+                const date = document.querySelector('#date').value
+                fetch('/working-opd?date='+date)
+                    .then(res => res.json())
+                    .then(res => {
+                        document.querySelector('.opd-list').innerHTML = `<option value="">Pilih</option>`
+                        res.data.forEach(opd => {
+                            document.querySelector('.opd-list').innerHTML += `<option value="${opd.id}">${opd.name}</option>`
+                        })
+                    })
+            }
+
+            function reservation()
+            {
+                const data = {
+                    name: document.querySelector('#name').value,
+                    phone: document.querySelector('#phone').value,
+                    date: document.querySelector('#date').value,
+                    organization_id: document.querySelector('#organization_id').value,
+                }
+
+                if(!data.name || !data.phone || !data.date || !data.organization_id)
+                {
+                    alert('Form tidak boleh kosong')
+                    return
+                }
+
+                const formData = new FormData;
+                formData.append('_token', document.querySelector('[name="_token"]').value)
+                formData.append('name', data.name)
+                formData.append('phone', data.phone)
+                formData.append('date', data.date)
+                formData.append('organization_id', data.organization_id)
+                fetch('/reservation', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(res => res.json())
+                    .then(res => {
+                        if(res.message == 'reservation fail')
+                        {
+                            alert('Reservasi gagal karena sudah mencapai limit')
+                            return
+                        }
+                        document.querySelector('#name').value = ''
+                        document.querySelector('#phone').value = ''
+                        document.querySelector('#date').value = ''
+                        document.querySelector('#organization_id').value = ''
+                        document.querySelector('.reservation-content').innerHTML = res.data.code
+
+                        var reservationModal = new bootstrap.Modal(document.getElementById('reservationModal'))
+                        reservationModal.show()
+                        
+                    })
+            }
+        </script>
     </body>
 </html>
