@@ -11,7 +11,7 @@
     <title>@yield('title', 'Antrian')</title>
     <style>
         body {
-            background-image: url('/modules/antrian/img/home-bg.jpg');
+            background-image: url('/modules/antrian/img/welcome-hero.png');
             background-size: cover;
             background-repeat: no-repeat;
             height: 100vh;
@@ -79,7 +79,7 @@
                 <img src="{{config('app.logo')}}" alt="" height="200px">
     
                 <h1 class="app-name">Selamat Datang di Sistem {{config('app.name')}}</h1>
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloremque culpa distinctio sapiente, rerum quo maxime quos. Nobis est vero dolorem accusamus, inventore quisquam quam minima dicta et aspernatur numquam eveniet.</p>
+                <p>Sistem antrian ini dibuat untuk memudahkan pelayanan antrian pada Mall Pelayanan Public Kabupaten Batubara.</p>
 
                 <button class="btn btn-primary btn-ambil-antrian" data-bs-toggle="modal" data-bs-target="#opdModal">Ambil Antrian</button>
                 &nbsp;&nbsp;

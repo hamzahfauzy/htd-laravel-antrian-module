@@ -54,6 +54,12 @@
                 top: 0;
                 opacity: 0.8;
             }
+            @media screen and (max-width: 575px) {
+                .hero-container {
+                    padding-left: 0 !important;
+                    padding-right: 0 !important;
+                }
+            }
         </style>
     </head>
     <body>
@@ -99,8 +105,8 @@
         </header>
 
         <main>
-            <div class="px-5 bg-body-secondary">
-                <div class="container">
+            <div class="bg-body-secondary">
+                <div class="container hero-container">
                     <div class="hero">
                         <div class="hero-overlay"></div>
                         <div class="hero-content text-center">
@@ -110,14 +116,14 @@
                     </div>
                 </div>
             </div>
-            <div class="p-5 bg-white" id="antrian">
+            <div class="py-5 bg-white" id="antrian">
                 <div class="container py-4 text-center">
                     <h2 class="fs-2 fw-bold">Tidak Mau Nunggu Lama ? <br> Yuk Ambil Antrian</h2>
 
                     <button class="btn btn-warning mt-3 btn-lg text-uppercase fw-medium" data-bs-toggle="modal" data-bs-target="#boardingModal">Ambil Antrian Online</button>
                 </div>
             </div>
-            <div class="p-5 bg-body-secondary" id="loket">
+            <div class="py-5 bg-body-secondary" id="loket">
                 <div class="container py-4">
                     <h2 class="fs-2 fw-bold mb-3">Loket Layanan OPD</h2>
 
@@ -207,7 +213,7 @@
                 </div>
             </div>
 
-            <div class="p-5 bg-info text-uppercase text-center">
+            <div class="py-5 bg-info text-uppercase text-center">
                 <div class="container py-4">
                     <div class="row">
                         <div class="col-md-3 mb-3">
@@ -246,7 +252,7 @@
                 </div>
             </div>
 
-            <div class="p-5 bg-body-secondary">
+            <div class="py-5 bg-body-secondary">
                 <div class="container py-4">
                     <h2
                         class="fs-2 fw-bold py-3 px-5 bg-white m-0 rounded-top-4 border"
@@ -301,11 +307,11 @@
         </main>
 
         <footer>
-            <div class="p-5 bg-white">
+            <div class="py-5 bg-white">
                 <div class="container py-4">
                     <div class="row">
                         <div class="col-md-4 d-flex align-items-center mb-3">
-                            <img src="{{asset('modules/antrian/img/logo.png')}}" alt="">
+                            <img src="{{asset('modules/antrian/img/logo.png')}}" alt="" style="max-width:200px">
                         </div>
                         <div class="col-md-4 mb-3">
                             <div>
