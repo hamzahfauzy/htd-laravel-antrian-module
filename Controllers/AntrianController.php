@@ -8,6 +8,7 @@ use App\Modules\Antrian\Models\Organization;
 use App\Modules\Antrian\Models\QueueList;
 use App\Modules\Antrian\Models\Reservation;
 use Illuminate\Http\Request;
+use App\Modules\Cms\Models\Post;
 
 class AntrianController extends Controller
 {
@@ -35,6 +36,45 @@ class AntrianController extends Controller
             'message' => 'opd retrieved',
             'data' => $organizations
         ]);
+    }
+
+    public function getStatistics()
+    {
+        $date = now()->format('Y-m-d');
+        $opd = Organization::get();
+        $antrianFinish = QueueList::where('record_status', 'FINISH')->count();
+        $kunjunganToday = QueueList::where('record_status', 'ON QUEUE')->where('created_at','LIKE',"%$date%")->count();
+
+        return response()->json([
+            'message' => 'posts retrieved',
+            'data' => [
+                'opd' => $opd,
+                'antrianFinish' => $antrianFinish,
+                'kunjunganToday' => $kunjunganToday,
+            ]
+        ]);
+    }
+
+    public function getPosts()
+    {
+        $data = Post::where('visibility', 'PUBLISH')->orderBy('created_at', 'desc')->take(5)->get();
+
+        return response()->json([
+            'message' => 'posts retrieved',
+            'data' => $data
+        ]);
+    }
+
+    public function allPost()
+    {
+        $posts = Post::where('visibility', 'PUBLISH')->get();
+        return view('antrian::post.index', compact('posts'));
+    }
+
+    public function detailPost($slug)
+    {
+        $post = Post::where('slug', $slug)->first();
+        return view('antrian::post.detail', compact('post'));
     }
 
     public function take($organization_id)
@@ -146,5 +186,26 @@ class AntrianController extends Controller
     public function queueDisplay()
     {
         return view('antrian::queue-display');
+    }
+
+    public function landing()
+    {
+        return view('antrian::landing');
+    }
+
+    public function antrian()
+    {
+        $organizations = Organization::get();
+        return view('antrian::antrian', compact('organizations'));
+    }
+
+    public function servingLoad()
+    {
+        $data = QueueList::where('record_status','SERVING')->where('created_at', 'LIKE', '%'.now()->format('Y-m-d').'%')->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $data
+        ]);
     }
 }

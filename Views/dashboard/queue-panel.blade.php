@@ -81,6 +81,7 @@
 var offlineCallerId = 0
 var onlineCallerId = 0
 
+window.organization = <?=json_encode(\App\Modules\Antrian\Libraries\Utility::getUserOrganization(auth()->user())?->organization)?>;
 window.SOCKET_URL  = "{{env('SOCKET_URL', 'http://localhost:3001')}}"; 
 window.SOCKET_PATH = "{{env('SOCKET_PATH', '') . env('SOCKET_IO_PATH', '')}}";
 window.SOCKET_ID   = "{{auth()->id()}}";
@@ -90,7 +91,38 @@ const socket = io(window.SOCKET_URL,{
 });
 socket.on("connect", () => {
     socket.emit('subscribe', {userId:window.SOCKET_ID})
+    
+    socket.on('receive', data => {
+        if(data.message == "disable_caller_button")
+        {
+            let seconds = 10;
+            var btn1 = document.querySelector('#offline-caller')
+            var btn2 = document.querySelector('#online-caller')
+
+            btn1.textContent = `Panggil dalam ${seconds} detik...`;
+            btn2.textContent = `Panggil dalam ${seconds} detik...`;
+
+            btn1.disabled = true
+            btn2.disabled = true
+
+            const interval = setInterval(() => {
+                seconds--;
+                btn1.textContent = `Panggil dalam ${seconds} detik...`;
+                btn2.textContent = `Panggil dalam ${seconds} detik...`;
+
+                if (seconds <= 0) {
+                    clearInterval(interval);
+                    btn1.disabled = false;
+                    btn1.textContent = 'Panggil';
+                    
+                    btn2.disabled = false;
+                    btn2.textContent = 'Panggil';
+                }
+            }, 1000);
+        }
+    })
 });
+
 
 function loadQueue(type, target)
 {
@@ -137,12 +169,19 @@ function caller(type)
 
     socket.emit('send', {
         target:'caller_device',
-        message: 'Antrian dengan nomor ' + queueNumber + ' agar segera menuju ke loket ' + document.querySelector('#pos_number').innerHTML
+        message: 'Antrian dengan nomor ' + queueNumber + ' agar segera menuju ke loket ' + document.querySelector('#pos_number').innerHTML,
+        action: 'caller_device'
+    })
+    
+    socket.emit('broadcast', {
+        action: 'disable_caller_button',
+        message: 'disable_caller_button'
     })
 
     socket.emit('send', {
-        target: 'display-'+window.SOCKET_ID,
-        message: queueNumber
+        target: 'display_device',
+        message: queueNumber,
+        organization: window.organization
     })
 }
 
@@ -214,9 +253,16 @@ function done()
     loadQueue(target.toUpperCase(),'#'+target+'-queue')
     document.querySelector('#btn-done').style.display = 'none'
 
-    setTimeout(() => {
-        caller(target)
-    }, 1000);
+    socket.emit('send', {
+        target: 'display_device',
+        message: 'clear_display',
+        action: 'clear_display',
+        organization: window.organization
+    })
+
+    // setTimeout(() => {
+        // caller(target)
+    // }, 1000);
 }
 
 loadQueue('ONLINE','#online-queue')

@@ -128,6 +128,7 @@ class OrganizationResource extends Resource
             'service_status' => 'required',
             'queue_limit' => 'required',
             'pos_number' => 'required',
+            'pic_url' => 'nullable'
         ];
     }
     
@@ -140,6 +141,7 @@ class OrganizationResource extends Resource
             'service_status' => 'required',
             'queue_limit' => 'required',
             'pos_number' => 'required',
+            'pic_url' => 'nullable'
         ];
     }
 }
