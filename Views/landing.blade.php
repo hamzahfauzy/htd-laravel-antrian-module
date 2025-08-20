@@ -102,7 +102,7 @@
                     
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary btn-lg" data-bs-dismiss="modal">Tutup</button>
+                    <button class="btn btn-secondary btn-lg" id="opdCloseModal" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>
@@ -153,7 +153,10 @@
             // else
             // {
             // }
-            calling(data.message)
+            if(data.type == 'send' && data.hasOwnProperty('action') && data.action == 'caller_device')
+            {
+                calling(data.message)
+            }
         })
     });
 
@@ -185,6 +188,8 @@
                 fetch('http://localhost:8080', {
                     method: 'POST',
                     body: formData
+                }).then(res => {
+                    document.querySelector('#opdCloseModal').click()
                 })
             })
     }

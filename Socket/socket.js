@@ -7,7 +7,7 @@ import { Server } from 'socket.io'
 
 dotenv.config({path: '../../../../.env'})
 
-const socketPort = 3001
+const socketPort = 3002
 
 const app = express()
 
@@ -88,6 +88,7 @@ io.on('connection', socket => {
     })
 
     socket.on('broadcast', (data) => {
+        data.type = 'broadcast'
         subscribers.forEach(subscriber => {
             const socket = subscriber.socket
             socket.emit('receive', data)
@@ -95,6 +96,7 @@ io.on('connection', socket => {
     })
     
     socket.on('send', (data) => {
+        data.type = 'send'
         const subs = subscribers.filter(c => c.userId == data.target)
         subs.forEach(subscriber => {
             const socket = subscriber.socket
