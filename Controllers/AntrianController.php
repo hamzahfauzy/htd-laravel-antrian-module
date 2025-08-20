@@ -11,6 +11,10 @@ use Illuminate\Http\Request;
 
 class AntrianController extends Controller
 {
+    public function welcome()
+    {
+        return view('antrian::index');
+    }
 
     public function index($type)
     {

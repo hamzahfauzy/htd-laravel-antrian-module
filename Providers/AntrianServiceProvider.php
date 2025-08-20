@@ -4,6 +4,7 @@ namespace App\Modules\Antrian\Providers;
 
 use App\Libraries\Dashboard;
 use App\Libraries\NavPanel;
+use App\Modules\Antrian\Controllers\AntrianController;
 use App\Modules\Antrian\Libraries\Utility;
 use Illuminate\Support\ServiceProvider;
 
@@ -17,7 +18,7 @@ class AntrianServiceProvider extends ServiceProvider
 
         Dashboard::add(\App\Modules\Antrian\Services\DashboardService::queueDisplayDashboard());
     
-        Dashboard::setWelcomeScreen(view('antrian::index'));
+        Dashboard::setWelcomeScreen(app(AntrianController::class)->welcome());
 
         NavPanel::add([
             'url' => url('/queue-display'),
